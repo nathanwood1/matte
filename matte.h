@@ -5,35 +5,60 @@
  *      Author: root
  */
 
+#include <stddef.h>
+
 #ifndef MATTE_H_
 #define MATTE_H_
 
-struct tensor {
-	float* values; // Array of floats for values
-	unsigned int valuesLength; // Length of values
-	unsigned int* shape; // Shape of tensor
-	unsigned int* dimension; // Array to convert a list of dimensions to an index
-	unsigned int dimensions;
-};
+typedef struct {
+	size_t dimensions;			// Amount of dimensions in tensor.
+	size_t *shape;				// Shape of tensor.
+	size_t *indices;			// Used to convert multiple indices into a single one.
 
-struct tensor* create_tensor(unsigned int* shape, unsigned int dimensions);
-struct tensor* create_tensor_no_shape_copy(unsigned int* shape, unsigned int dimensions);
-void delete_tensor(struct tensor* t);
+	float *values;				// Actual values in tensor.
+	size_t valuesLength;		// How many values there are.
+} tensor;
 
-struct tensor* copy_tensor(struct tensor* tensor);
+tensor *matte_allocate_tensor(size_t *shape, size_t dimensions);
+void matte_free_tensor(tensor *toFree);
 
-void fill_value(struct tensor* tensor, float value);
-void fill_tensor(struct tensor* tensor, struct tensor* value);
+tensor *matte_clone_tensor(tensor *cpy);
+tensor *matte_clone_tensor_shape(tensor *cpy);
 
-float get_value_from_index(struct tensor* tensor, unsigned int index);
-float get_value_from_indices(struct tensor* tensor, unsigned int* indices);
+void matte_set_tensor_from_tensor(tensor *a, tensor *b);
+void matte_set_tensor_from_scalar(tensor *a, float b);
 
-void set_value_from_index(struct tensor* tensor, unsigned int index, float value);
-void set_value_from_indices(struct tensor* tensor, unsigned int indices, float value);
+void matte_add_tensor_from_tensor(tensor *a, tensor *b);
+void matte_add_tensor_from_scalar(tensor *a, float b);
 
-unsigned int get_index_from_indices(struct tensor* tensor, unsigned int* indices);
+tensor *matte_add_tensor_and_tensor(tensor *a, tensor *b);
+tensor *matte_add_tensor_and_scalar(tensor *a, float b);
 
-struct tensor* add_value(struct tensor* from, struct tensor* to);
-void add_value_same_shape(struct tensor* from, struct tensor* to);
+void matte_subtract_tensor_from_tensor_to_a(tensor *a, tensor *b);
+void matte_subtract_tensor_from_tensor_to_b(tensor *a, tensor *b);
+void matte_subtract_tensor_from_scalar(tensor *a, float b);
+void matte_subtract_scalar_from_tensor(float b, tensor *a);
+
+tensor *matte_subtract_tensor_and_tensor(tensor *a, tensor *b);
+tensor *matte_subtract_tensor_and_scalar(tensor *a, tensor *b);
+tensor *matte_subtract_scalar_and_tensor(tensor *a, tensor *b);
+
+void matte_multiply_tensor_from_tensor(tensor *a, tensor *b);
+void matte_multiply_tensor_from_scalar(tensor *a, float b);
+
+tensor *matte_multiply_tensor_and_tensor(tensor *a, tensor *b);
+tensor *matte_multiply_tensor_and_scalar(tensor *a, float b);
+
+void matte_divide_tensor_from_tensor_to_a(tensor *a, tensor *b);
+void matte_divide_tensor_from_tensor_to_b(tensor *a, tensor *b);
+void matte_divide_tensor_from_scalar(tensor *a, float b);
+void matte_divide_scalar_from_tensor(float b, tensor *a);
+
+tensor *matte_divide_tensor_and_tensor(tensor *a, tensor *b);
+tensor *matte_divide_tensor_and_scalar(tensor *a, tensor *b);
+tensor *matte_divide_scalar_and_tensor(tensor *a, tensor *b);
+
+float matte_max(tensor *value);
+float matte_min(tensor *value);
 
 #endif
